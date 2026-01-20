@@ -2,20 +2,55 @@ import * as React from "react";
 
 import { cn } from "./utils";
 
-function Input({ className, type, ...props }: React.ComponentProps<"input">) {
-  return (
-    <input
-      type={type}
-      data-slot="input"
-      className={cn(
-        "file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input flex h-9 w-full min-w-0 rounded-md border px-3 py-1 text-base bg-input-background transition-[color,box-shadow] outline-none file:inline-flex file:h-7 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-        "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]",
-        "aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
-        className,
-      )}
-      {...props}
-    />
-  );
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  error?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
 }
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, error, leftIcon, rightIcon, ...props }, ref) => {
+    return (
+      <div className="relative w-full">
+        {leftIcon && (
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 text-icon-muted pointer-events-none">
+            {leftIcon}
+          </div>
+        )}
+        <input
+          type={type}
+          ref={ref}
+          data-slot="input"
+          className={cn(
+            // Base styles
+            "flex h-12 w-full rounded-xl border-2 bg-input-background px-4 py-3 text-base text-foreground transition-colors",
+            // Placeholder
+            "placeholder:text-input-placeholder",
+            // Focus state
+            "focus:border-input-border-focus focus:outline-none focus:ring-0",
+            // Disabled state
+            "disabled:cursor-not-allowed disabled:opacity-50",
+            // Default border
+            "border-input-border",
+            // Error state
+            error && "border-destructive focus:border-destructive",
+            // Icon padding
+            leftIcon && "pl-12",
+            rightIcon && "pr-12",
+            className,
+          )}
+          {...props}
+        />
+        {rightIcon && (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 text-icon-muted">
+            {rightIcon}
+          </div>
+        )}
+      </div>
+    );
+  }
+);
+Input.displayName = "Input";
 
 export { Input };
